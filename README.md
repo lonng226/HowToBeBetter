@@ -177,6 +177,22 @@ A 级只说明「有具体数字、出处可核」，不说明这个数字一定
 
 正文按节拆成 8 个文件放在 [book/](book/)，点上面目录里的节名进入。
 
+每处「见第 X 节第 Y 条」都实际指向哪一条，摊开写在 [交叉引用对照表](docs/引用对照.md) 里。
+
+## 怎么改这本书
+
+正文用三道机器检查守着，改完跑一遍就行：
+
+```bash
+node tools/check-plain.mjs --numbers   # 说人话：长度、研究行话、数字溯源
+node tools/check-refs.mjs --check      # 交叉引用：指向是否正确、有没有锚点
+node tools/check-stats.mjs             # README 的统计数字是否和正文一致
+```
+
+前两道在每次 push 和 PR 上自动跑（见 [质检工作流](.github/workflows/quality.yml)）。写作规则全在 [CLAUDE.md](CLAUDE.md) 里，改条目之前先读。
+
+发现问题请[提 issue](https://github.com/lonng226/HowToBeBetter/issues)，纠错和新内容各有一个模板。
+
 ## 许可
 
 正文用 [CC BY 4.0](LICENSE) 发布，范围是 book/ 和本 README 的文字。你可以转载、改编、商用，不用来问作者，但要做到两件事：
@@ -185,6 +201,10 @@ A 级只说明「有具体数字、出处可核」，不说明这个数字一定
 - 附上许可证链接 https://creativecommons.org/licenses/by/4.0/ 。
 
 书里的法条、裁判规则和司法解释经常更新，转载时建议同时写上你同步的是哪一天的版本。
+
+代码用 [MIT](LICENSE-CODE)，范围是 tools/ 下的质检脚本。正文和代码分别授权，转载正文不需要一并处理代码。
+
+许可的中文摘要、来源交代和免责声明见 [NOTICE.md](NOTICE.md)。
 
 **本书的三本参考读物均为在售的商业出版物，本项目与这些书的出版方和作者没有任何关系。全书条目为独立重新编写，不复制原书文字。原书出处列在下面，供查证与延伸阅读：**
 

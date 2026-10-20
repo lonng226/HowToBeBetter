@@ -1,0 +1,72 @@
+# 三道机器检查：说人话、交叉引用、统计数字。
+#
+# 单独一个 workflow，不跟着发布走。参考项目把它们挂在电子书构建的同一个文件里，
+# 但那是因为它有 EPUB/PDF/离线版/卡组四个出口，正文一改就得全部重建。
+# 本项目只有 Markdown，一个发布环节都没有，所以这三道检查就是全部。
+#
+# 每一道都失败即红，因为它们查的都是真问题：
+#   说人话    —— 这一行是读者最常看的部分，写长了、塞了研究行话、添了收益栏没有的数字，
+#                读者就会误判这条到底有多硬。
+#   交叉引用  —— 条号是位置依赖的。插入或删除条目会让后面的引用集体错位，
+#                而错位后的条号往往仍在范围内，光查越界抓不到。锚点就是防这个的。
+#   统计数字  —— README 里的条目数和 A/B/C 分布是读者判断这本书分量的唯一依据，
+#                数字和正文脱节就是骗人。
+name: 质检
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - README.md
+      - NOTICE.md
+      - book/**
+      - docs/**
+      - tools/**
+      - .github/workflows/quality.yml
+  pull_request:
+    paths:
+      - README.md
+      - NOTICE.md
+      - book/**
+      - docs/**
+      - tools/**
+      - .github/workflows/quality.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plain:
+    name: 说人话检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/check-plain.mjs
+
+  refs:
+    name: 交叉引用检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/check-refs.mjs --check
+
+  stats:
+    name: 统计数字检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/check-stats.mjs
